@@ -1,0 +1,38 @@
+[
+  {
+    "id": "overdue-high",
+    "title": "Submit status update",
+    "description": "Send the overdue weekly status update to the project channel.",
+    "due_date": "2026-06-09",
+    "estimated_minutes": 30,
+    "priority": "high",
+    "completed": false
+  },
+  {
+    "id": "today-medium",
+    "title": "Review planner requirements",
+    "description": "Read the locked decisions and verify Phase 1 stays inside scope.",
+    "due_date": "2026-06-10",
+    "estimated_minutes": 45,
+    "priority": "medium",
+    "completed": false
+  },
+  {
+    "id": "future-low",
+    "title": "Prepare tomorrow notes",
+    "description": "Draft notes for tomorrow's planning session.",
+    "due_date": "2026-06-11",
+    "estimated_minutes": 25,
+    "priority": "low",
+    "completed": false
+  },
+  {
+    "id": "completed-medium",
+    "title": "Archive yesterday notes",
+    "description": "Move yesterday's notes into the project history folder.",
+    "due_date": "2026-06-10",
+    "estimated_minutes": 15,
+    "priority": "medium",
+    "completed": true
+  }
+]
