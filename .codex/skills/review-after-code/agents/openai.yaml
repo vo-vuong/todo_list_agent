@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review After Code"
+  short_description: "Review implementation against context"
+  default_prompt: "Use $review-after-code to review the implementation against CONTEXT.md, approach.md, work-plan.md, and validation results."

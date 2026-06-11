@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from datetime import date
 
+from daily_planner_agent.chat_agent import ChatActionTrace, ChatToolCallTrace
 from daily_planner_agent.models import Task, TaskCreate
-from daily_planner_agent.streamlit_app import incomplete_task_options, task_create_rows, task_rows
+from daily_planner_agent.streamlit_app import action_trace_rows, incomplete_task_options, task_create_rows, task_rows
 
 
 def test_task_rows_uses_locked_task_schema() -> None:
@@ -69,5 +70,27 @@ def test_task_create_rows_formats_chat_draft() -> None:
             "due_date": "2026-06-12",
             "estimated_minutes": 45,
             "priority": "high",
+        }
+    ]
+
+
+def test_action_trace_rows_exposes_discovery_selection_arguments_and_summary() -> None:
+    trace = ChatActionTrace(
+        discovered_tools=["list_tasks", "complete_task_by_reference"],
+        calls=[
+            ChatToolCallTrace(
+                tool_name="complete_task_by_reference",
+                arguments={"reference": "Open task"},
+                result_summary="completed: Completed task open-task.",
+            )
+        ],
+    )
+
+    assert action_trace_rows(trace) == [
+        {
+            "discovered_tools": "list_tasks, complete_task_by_reference",
+            "selected_tool": "complete_task_by_reference",
+            "arguments": {"reference": "Open task"},
+            "result_summary": "completed: Completed task open-task.",
         }
     ]

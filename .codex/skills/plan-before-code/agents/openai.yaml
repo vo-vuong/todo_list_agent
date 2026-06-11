@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan Before Code"
+  short_description: "Plan phases from CONTEXT before coding"
+  default_prompt: "Use $plan-before-code to create the smallest work shape from the approved CONTEXT.md, including a phase plan when needed, without Beads or epic maps."

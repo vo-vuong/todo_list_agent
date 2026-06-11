@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp import ClientSession
 from mcp.client.sse import sse_client
+from pydantic import BaseModel, ConfigDict
 
 from daily_planner_agent.config import get_mcp_server_settings
 from daily_planner_agent.models import Priority, Task
@@ -13,6 +14,13 @@ from daily_planner_agent.models import Priority, Task
 
 class McpClientError(RuntimeError):
     """Raised when the planner cannot call the MCP task server."""
+
+
+class McpToolInfo(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: str
+    description: str = ""
 
 
 @asynccontextmanager
@@ -26,6 +34,18 @@ async def task_session() -> AsyncIterator[ClientSession]:
         except Exception as exc:
             raise McpClientError(f"Could not connect to MCP server at {settings.url}") from exc
         yield session
+
+
+async def discover_tools() -> list[McpToolInfo]:
+    async with task_session() as session:
+        result = await session.list_tools()
+    return [
+        McpToolInfo(
+            name=tool.name,
+            description=tool.description or "",
+        )
+        for tool in result.tools
+    ]
 
 
 async def list_tasks(*, include_completed: bool = True) -> list[Task]:

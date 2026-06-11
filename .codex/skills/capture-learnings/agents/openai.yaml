@@ -1,0 +1,4 @@
+interface:
+  display_name: "Capture Learnings"
+  short_description: "Capture reusable lessons after review"
+  default_prompt: "Use $capture-learnings to write lightweight project learnings after review completes, without Beads or subagents."

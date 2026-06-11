@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.1",
+  "active_skill": "review-after-code",
+  "feature_slug": "chat-agent-mcp-tool-discovery",
+  "mode": "small_change",
+  "phase": "review-complete",
+  "phase_number": 0,
+  "current_work": "Implement chat-driven MCP action execution for completing tasks and generating markdown reports, with visible per-turn discovery/selection trace in the Streamlit Chat tab.",
+  "approved_gates": {
+    "context": true,
+    "work_shape": true,
+    "phase_plan": false,
+    "execution": true,
+    "review": true
+  },
+  "summary": "Review approved. Feature is ready for learning capture.",
+  "next_action": "Invoke capture-learnings.",
+  "focus": "history/chat-agent-mcp-tool-discovery/review.md",
+  "blockers": [],
+  "last_updated": "2026-06-11T07:47:51+07:00"
+}

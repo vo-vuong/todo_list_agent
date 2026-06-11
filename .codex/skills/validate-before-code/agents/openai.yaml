@@ -1,0 +1,4 @@
+interface:
+  display_name: "Validate Before Code"
+  short_description: "Validate plan feasibility before coding"
+  default_prompt: "Use $validate-before-code to prove the approved work plan is feasible before implementation."

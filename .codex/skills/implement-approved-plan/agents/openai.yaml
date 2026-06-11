@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implement Approved Plan"
+  short_description: "Implement one approved plan without workers"
+  default_prompt: "Use $implement-approved-plan to implement the validated work plan in the main agent without Beads or spawned workers."

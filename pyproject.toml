@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "mcp[cli]>=1.27.2",
     "pydantic>=2.13.0",
-    "pydantic-ai-slim[openai]>=1.107.0",
+    "pydantic-ai-slim[mcp,openai]>=1.107.0",
     "python-dotenv>=1.0.1",
     "streamlit>=1.58.0",
 ]

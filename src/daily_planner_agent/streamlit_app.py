@@ -8,7 +8,14 @@ from typing import TypeVar, cast
 import anyio
 import streamlit as st
 
-from daily_planner_agent.chat_agent import ChatMessage, ChatRole, draft_task_from_chat
+from daily_planner_agent.chat_agent import (
+    ChatActionTrace,
+    ChatMessage,
+    ChatRole,
+    draft_task_from_chat,
+    looks_like_action_request,
+    run_chat_action_from_chat,
+)
 from daily_planner_agent.config import get_mcp_server_settings
 from daily_planner_agent.mcp_client import (
     McpClientError,
@@ -25,6 +32,7 @@ from daily_planner_agent.reporting import render_markdown_report, write_markdown
 T = TypeVar("T")
 CHAT_MESSAGES_KEY = "chat_task_messages"
 CHAT_DRAFT_KEY = "chat_task_draft"
+CHAT_TRACES_KEY = "chat_action_traces"
 
 
 class GeneratedReport:
@@ -92,12 +100,18 @@ def render_chat_tab() -> None:
         with st.chat_message(message.role):
             st.markdown(message.content)
 
+    _render_chat_action_traces()
+
     draft = st.session_state.get(CHAT_DRAFT_KEY)
     if isinstance(draft, TaskCreate):
         _render_chat_draft(draft)
 
     if prompt := st.chat_input("Describe a task to create"):
         _append_chat_message("user", prompt)
+        if looks_like_action_request(prompt):
+            _handle_chat_action()
+            st.rerun()
+
         try:
             result = run_async(draft_task_from_chat(_chat_messages()))
         except MissingOpenAIKeyError as exc:
@@ -112,6 +126,21 @@ def render_chat_tab() -> None:
                 st.session_state.pop(CHAT_DRAFT_KEY, None)
                 _append_chat_message("assistant", result.follow_up_question or "What details should I use for this task?")
         st.rerun()
+
+
+def _handle_chat_action() -> None:
+    try:
+        result = run_async(run_chat_action_from_chat(_chat_messages()))
+    except MissingOpenAIKeyError as exc:
+        _append_chat_message("assistant", str(exc))
+    except McpClientError as exc:
+        _append_chat_message("assistant", str(exc))
+    except Exception as exc:
+        _append_chat_message("assistant", f"Could not execute the chat action: {exc}")
+    else:
+        st.session_state.pop(CHAT_DRAFT_KEY, None)
+        _append_chat_message("assistant", result.message)
+        _append_chat_trace(result.trace)
 
 
 def _render_chat_draft(draft: TaskCreate) -> None:
@@ -180,6 +209,28 @@ def task_create_rows(task: TaskCreate) -> list[dict[str, object]]:
     ]
 
 
+def action_trace_rows(trace: ChatActionTrace) -> list[dict[str, object]]:
+    discovered_tools = ", ".join(trace.discovered_tools)
+    if not trace.calls:
+        return [
+            {
+                "discovered_tools": discovered_tools,
+                "selected_tool": "-",
+                "arguments": "{}",
+                "result_summary": "No MCP tool was called.",
+            }
+        ]
+    return [
+        {
+            "discovered_tools": discovered_tools,
+            "selected_tool": call.tool_name,
+            "arguments": call.arguments,
+            "result_summary": call.result_summary,
+        }
+        for call in trace.calls
+    ]
+
+
 def incomplete_task_options(tasks: list[Task]) -> dict[str, str]:
     return {
         f"{task.title} ({task.id})": task.id
@@ -190,6 +241,7 @@ def incomplete_task_options(tasks: list[Task]) -> dict[str, str]:
 
 def _ensure_chat_state() -> None:
     st.session_state.setdefault(CHAT_MESSAGES_KEY, [])
+    st.session_state.setdefault(CHAT_TRACES_KEY, [])
 
 
 def _chat_messages() -> list[ChatMessage]:
@@ -204,6 +256,22 @@ def _append_chat_message(role: ChatRole, content: str) -> None:
     _ensure_chat_state()
     message = ChatMessage(role=role, content=content)
     st.session_state[CHAT_MESSAGES_KEY].append(message.model_dump())
+
+
+def _append_chat_trace(trace: ChatActionTrace) -> None:
+    _ensure_chat_state()
+    st.session_state[CHAT_TRACES_KEY].append(trace.model_dump())
+
+
+def _chat_traces() -> list[ChatActionTrace]:
+    _ensure_chat_state()
+    return [ChatActionTrace.model_validate(item) for item in st.session_state[CHAT_TRACES_KEY]]
+
+
+def _render_chat_action_traces() -> None:
+    for index, trace in enumerate(_chat_traces(), start=1):
+        with st.expander(f"MCP tool trace #{index}", expanded=True):
+            st.dataframe(action_trace_rows(trace), hide_index=True, width="stretch")
 
 
 def _load_tasks_for_ui() -> list[Task]:

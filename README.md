@@ -198,7 +198,7 @@ UI có ba tab:
 
 - `Tasks`: xem task, thêm task, hoàn thành task, reset dữ liệu mẫu.
 - `Planner`: sinh kế hoạch hằng ngày, preview markdown và tải file report.
-- `Chat`: nhập yêu cầu bằng ngôn ngữ tự nhiên để agent tạo bản nháp task. Nếu thiếu `title`, `due_date`, `estimated_minutes` hoặc `priority`, agent sẽ hỏi lại. Task chỉ được lưu sau khi bạn bấm `Save task`.
+- `Chat`: nhập yêu cầu bằng ngôn ngữ tự nhiên để agent tạo bản nháp task, hoàn thành task, hoặc xuất report markdown. Với lệnh hoàn thành task/xuất report, agent kết nối MCP server, discover tools, chọn tool phù hợp, thực thi ngay khi lệnh rõ, và hiển thị trace gồm discovered tools, selected tool, arguments, result summary.
 
 Ví dụ Chat có đủ thông tin:
 
@@ -213,6 +213,14 @@ Nhắc tôi chuẩn bị slide demo.
 ```
 
 Trong trường hợp thiếu thông tin, agent sẽ hỏi lại thay vì tự chọn ngày, thời lượng hoặc priority mặc định.
+
+Ví dụ Chat action qua MCP:
+
+```text
+Hoàn thành task today-medium rồi xuất file plan markdown.
+```
+
+Có thể hoàn thành task bằng task ID hoặc title. Nếu title trùng nhiều task chưa hoàn thành, agent sẽ hỏi lại task ID thay vì tự chọn.
 
 ## Chạy CLI
 

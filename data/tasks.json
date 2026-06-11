@@ -42,6 +42,6 @@
     "due_date": "2026-06-11",
     "estimated_minutes": 120,
     "priority": "high",
-    "completed": false
+    "completed": true
   }
 ]

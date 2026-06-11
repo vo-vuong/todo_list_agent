@@ -1,0 +1,4 @@
+interface:
+  display_name: "Clarify Before Code"
+  short_description: "Clarify requests before coding"
+  default_prompt: "Use $clarify-before-code to clarify my feature request before implementation."
